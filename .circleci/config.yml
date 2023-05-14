@@ -43,8 +43,7 @@ jobs:
           name: Lint python and dockerfile
           command: |
             . venv/bin/activate
-            make lint_python
-            make lint_docker           
+            make lint
       - save_cache:
           paths:
             - ./venv
@@ -144,7 +143,7 @@ jobs:
 
 workflows:
   version: 2
-  build-and-test:
+  build-and-deploy:
     jobs:
       - setup-env-and-install-dependencies
       - lint:
