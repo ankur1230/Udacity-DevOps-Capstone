@@ -79,7 +79,8 @@ jobs:
             - v1-dependencies-         
       - run:
           name: Create EKS Cluster
-          command: |        
+          command: |  
+            eksctl version
             CLUSTER=$(eksctl get cluster |grep udacity-capstone|awk '{print $1}')
             echo $CLUSTER
             if [ "$CLUSTER" = "udacity-capstone" ]
