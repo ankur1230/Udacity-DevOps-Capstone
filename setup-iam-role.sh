@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-EKS_ROLE_NAME=$1
+EKS_ROLE_NAME=eksClusterRole
 EKS_PROFILE_NAME=udacity-eks
 CFN_STACK_NAME=eksctl-udacity-cluster
 EKS_ADMIN_USER=udacity-eks-admin-user
