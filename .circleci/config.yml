@@ -63,8 +63,8 @@ jobs:
           command: |
             docker build -t capstone .
             echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker tag capstone ankur3012/capstone:latest
-            docker push ankur3012/capstone:latest
+            docker tag capstone $DOCKERHUB_USERNAME/capstone:latest
+            docker push $DOCKERHUB_USERNAME/capstone:latest
  
   create-eks-cluster:
     working_directory: ~/apps
@@ -81,6 +81,7 @@ jobs:
           name: Create EKS Cluster
           command: |  
             eksctl version
+            eksctl create cluster -f cloudformation/create-cluster.yml
             CLUSTER=$(eksctl get cluster |grep udacity-capstone|awk '{print $1}')
             echo $CLUSTER
             if [ "$CLUSTER" = "udacity-capstone" ]
@@ -130,7 +131,7 @@ jobs:
           name: Deploy Docker Image to EKS Cluster
           command: |  
             aws eks --region us-east-1 update-kubeconfig --name udacity-capstone
-            NS=$(kubectl get namespace uda-capstone |grep udacity-capstone|awk '{print $1}')
+            NS=$(kubectl get namespace udacity-capstone |grep udacity-capstone|awk '{print $1}')
             echo $NS
             if [ "$NS" = "udacity-capstone" ]
             then
