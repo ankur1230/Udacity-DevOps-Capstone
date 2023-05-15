@@ -155,8 +155,8 @@ workflows:
       - build-docker-image:
           requires:
             - lint
-      - create-eks-cluster
+      #- create-eks-cluster
       - setup-iam
       - deploy-application:
-          requires: ['build-docker-image' , 'create-eks-cluster']
-          #requires: ['build-docker-image']
+          #requires: ['build-docker-image' , 'create-eks-cluster']
+          requires: ['build-docker-image']
