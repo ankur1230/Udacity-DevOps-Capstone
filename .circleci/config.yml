@@ -131,7 +131,7 @@ jobs:
           name: Deploy Docker Image to EKS Cluster
           command: |  
             aws eks --region us-east-1 update-kubeconfig --name udacity-capstone
-            kubectl create namespace udacity-capstone
+            #kubectl create namespace udacity-capstone
             NS=$(kubectl get namespace udacity-capstone |grep udacity-capstone|awk '{print $1}')
             echo $NS
             if [ "$NS" = "udacity-capstone" ]
