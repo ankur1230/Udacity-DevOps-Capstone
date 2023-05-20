@@ -108,11 +108,10 @@ workflows:
   default:
     jobs:
       - build-test
-      #- build-docker-image:
-      #    requires:
-      #      - lint
+      - build-docker-image:
+          requires:
+            - build-test
       #- create-eks-cluster
-      #- setup-iam
       #- deploy-application:
       #    #requires: ['build-docker-image' , 'create-eks-cluster']
       #    requires: ['build-docker-image']
