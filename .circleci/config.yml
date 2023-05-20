@@ -80,14 +80,13 @@ jobs:
 
   deploy-application:
     docker: 
-        - image: circleci/python:3.7.3-stretch
-          user: root
+      - image: circleci/python:3.7.3-stretch
+        user: root
     working_directory: ~/apps
     steps:
-        - checkout
-        - setup_remote_docker:
-            docker_layer_caching: true
       - checkout
+      - setup_remote_docker:
+            docker_layer_caching: true
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
