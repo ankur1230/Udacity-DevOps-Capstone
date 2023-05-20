@@ -93,7 +93,7 @@ jobs:
           name: Deploy Docker Image to EKS Cluster
           command: |  
             # deploy cluster
-            aws eks update-kubeconfig --name cluster-${CIRCLE_WORKFLOW_ID:0:7}
+            aws eks update-kubeconfig --name cluster-1e1be7a
             docker pull $DOCKERHUB_USERNAME/capstone
             echo "pulled docker image and updated k8s config"
               
