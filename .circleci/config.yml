@@ -61,7 +61,7 @@ jobs:
       - run:
           name: Create EKS Cluster
           command: |
-            apk add --update tar gzip curl
+            sudo apt-get -y install tar gzip curl
             eksctl version
             eksctl create cluster --name cluster-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-1 --nodegroup-name ng-1 --node-type t2.micro --nodes 2 --version 1.24 --zones us-east-1a,us-east-1b
       - save_cache:
