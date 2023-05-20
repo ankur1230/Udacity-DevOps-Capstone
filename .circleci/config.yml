@@ -108,6 +108,7 @@ jobs:
             
             # deploy cluster
             aws eks update-kubeconfig --name cluster-1e1be7a
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
             docker pull $DOCKERHUB_USERNAME/capstone
             echo "pulled docker image and updated k8s config"
               
