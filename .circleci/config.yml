@@ -62,7 +62,17 @@ jobs:
           name: Create EKS Cluster
           command: |
             eksctl version
-            eksctl create cluster --name cluster-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-1 --nodegroup-name ng-1 --node-type t2.micro --nodes 2 --version 1.24 --zones us-east-1a,us-east-1b
+            set +e
+            eksctl get cluster --name=udacity-capstone --region=us-east-1 > /tmp/cluster_status 2>&1
+            if grep -q "No cluster found for name" /tmp/cluster_status; then
+              echo "Cluster not found, starting prod cluster"
+              eksctl create cluster --name udacity-capstone --region=us-east-1 --nodegroup-name udacity-capstone-ng-1 --node-type t2.micro --nodes 2 --version 1.24 --zones us-east-1a,us-east-1b
+            elif grep -q "ACTIVE" /tmp/cluster_status; then
+              echo "Cluster is running"
+            else
+              echo "Unknown cluster status"
+              exit 1
+            fi
       - save_cache:
           paths:
             - ./venv
@@ -82,18 +92,19 @@ jobs:
       - run:
           name: Deploy Docker Image to EKS Cluster
           command: |  
-            aws eks --region us-east-1 update-kubeconfig --name udacity-capstone
-            kubectl create namespace udacity-capstone
-            NS=$(kubectl get namespace udacity-capstone |grep udacity-capstone|awk '{print $1}')
-            echo $NS
-            if [ "$NS" = "udacity-capstone" ]
-            then
-              echo "Namespace exists"
-            else
-              echo "Creating Namespace"
-              kubectl create namespace udacity-capstone
-            fi
-            kubectl apply -f cloudformation/deployment.yml
+            # deploy cluster
+            aws eks update-kubeconfig --name cluster-${CIRCLE_WORKFLOW_ID:0:7}
+            docker pull $DOCKERHUB_USERNAME/capstone
+            echo "pulled docker image and updated k8s config"
+              
+            # deploy application to k8s cluster
+            kubectl apply -f scripts/deployment.yml
+            kubectl apply -f scripts/service.yml
+            echo "deployed application to k8s cluster"
+            kubectl wait pods -n default -l run=app-deployment --for condition=Ready --timeout=240s
+            kubectl -n default get all
+            ELB_IP=$(kubectl -n default get service app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            echo "$ELB_IP"
             
 
 workflows:
@@ -103,9 +114,9 @@ workflows:
       - build-docker-image:
           requires:
             - build-test
-      - create-eks-cluster:
-          requires:
-            - build-docker-image
-      #- deploy-application:
+      #- create-eks-cluster:
+      #    requires:
+      #      - build-docker-image
+      - deploy-application:
       #    requires: ['build-docker-image' , 'create-eks-cluster']
-      #    requires: ['build-docker-image']
+          requires: ['build-docker-image']
