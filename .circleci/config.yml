@@ -109,7 +109,7 @@ jobs:
             echo "installed kubectl"
             
             # deploy cluster
-            aws eks update-kubeconfig --name cluster-1e1be7a
+            aws eks update-kubeconfig --name udacity-capstone
             docker pull $DOCKERHUB_USERNAME/capstone:latest
             echo "pulled docker image and updated k8s config"
               
@@ -130,9 +130,6 @@ workflows:
       - build-docker-image:
           requires:
             - build-test
-      #- create-eks-cluster:
-      #    requires:
-      #      - build-docker-image
+      - create-eks-cluster
       - deploy-application:
-      #    requires: ['build-docker-image' , 'create-eks-cluster']
-          requires: ['build-docker-image']
+          requires: ['build-docker-image' , 'create-eks-cluster']
