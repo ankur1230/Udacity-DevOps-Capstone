@@ -79,10 +79,10 @@ jobs:
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
   deploy-application:
-    working_directory: ~/apps
     docker: 
         - image: circleci/python:3.7.3-stretch
           user: root
+    working_directory: ~/apps
     steps:
         - checkout
         - setup_remote_docker:
