@@ -81,7 +81,8 @@ jobs:
   deploy-application:
     working_directory: ~/apps
     docker:
-      - image: bearengineer/awscli-kubectl
+      - image: circleci/python:3.7.3-stretch
+        user: root
     steps:
       - checkout
       - restore_cache:
@@ -91,7 +92,20 @@ jobs:
             - v1-dependencies-         
       - run:
           name: Deploy Docker Image to EKS Cluster
-          command: |  
+          command: | 
+            # install some packages
+            sudo apt-get -y install tar gzip unzip curl
+            sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            sudo unzip awscliv2.zip
+            sudo ./aws/install
+            echo "installed awscli"
+
+            # install kubectl
+            curl -LO "https://dl.k8s.io/release/v1.24.12/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
+            echo "installed kubectl"
+            
             # deploy cluster
             aws eks update-kubeconfig --name cluster-1e1be7a
             docker pull $DOCKERHUB_USERNAME/capstone
