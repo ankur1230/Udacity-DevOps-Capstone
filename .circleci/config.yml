@@ -80,11 +80,13 @@ jobs:
 
   deploy-application:
     working_directory: ~/apps
-    docker:
-      - image: docker:20.10.21-git
+    docker: 
+        - image: circleci/python:3.7.3-stretch
+          user: root
     steps:
-      - setup_remote_docker:
-          version: 20.10.18
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
       - checkout
       - restore_cache:
           keys:
