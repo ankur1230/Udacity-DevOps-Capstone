@@ -104,7 +104,7 @@ workflows:
       - build-docker-image:
           requires:
             - build-test
-      - create-eks-cluster
+      - create-eks-cluster:
           requires:
             - build-docker-image
       #- deploy-application:
