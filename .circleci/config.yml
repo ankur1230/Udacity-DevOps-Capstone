@@ -1,4 +1,5 @@
-version: 2.1
+version: 2
+
 
 jobs:
 
@@ -59,18 +60,10 @@ jobs:
             - v1-dependencies-         
       - run:
           name: Create EKS Cluster
-          command: |  
+          command: |
+            apk add --update tar gzip curl
             eksctl version
-            eksctl create cluster -f cloudformation/create-cluster.yml
-            CLUSTER=$(eksctl get cluster |grep udacity-capstone|awk '{print $1}')
-            echo $CLUSTER
-            if [ "$CLUSTER" = "udacity-capstone" ]
-            then
-              echo "Cluster exists"
-            else
-              echo "Creating EKS cluster"
-              eksctl create cluster -f cloudformation/create-cluster.yml
-            fi  
+            eksctl create cluster --name cluster-${CIRCLE_WORKFLOW_ID:0:7} --region us-east-1 --nodegroup-name ng-1 --node-type t2.micro --nodes 2 --version 1.24 --zones us-east-1a,us-east-1b
       - save_cache:
           paths:
             - ./venv
@@ -111,7 +104,9 @@ workflows:
       - build-docker-image:
           requires:
             - build-test
-      #- create-eks-cluster
+      - create-eks-cluster
+          requires:
+            - build-docker-image
       #- deploy-application:
-      #    #requires: ['build-docker-image' , 'create-eks-cluster']
+      #    requires: ['build-docker-image' , 'create-eks-cluster']
       #    requires: ['build-docker-image']
