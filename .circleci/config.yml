@@ -81,9 +81,10 @@ jobs:
   deploy-application:
     working_directory: ~/apps
     docker:
-      - image: circleci/python:3.7.3-stretch
-        user: root
+      - image: docker:20.10.21-git
     steps:
+      - setup_remote_docker:
+          version: 20.10.18
       - checkout
       - restore_cache:
           keys:
@@ -108,7 +109,6 @@ jobs:
             
             # deploy cluster
             aws eks update-kubeconfig --name cluster-1e1be7a
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
             docker pull $DOCKERHUB_USERNAME/capstone:latest
             echo "pulled docker image and updated k8s config"
               
